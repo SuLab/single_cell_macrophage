@@ -21,13 +21,18 @@ library(grid)
 library(gridExtra)
 library(corrplot)
 
+#### set repository directory ####
+## assumes being run from rstudio
+baseDir <- "~/Documents/teyton_handover/single_cell_macrophage/"
+# currentFile <- rstudioapi::getActiveDocumentContext()$path
+# baseDir <- gsub("single_cell_macrophage/.*", "single_cell_macrophage/", currentFile)
 
-baseDir <- "~/Documents/teyton_handover/macrophage/"
 
 #### source function scripts ####
 funcDir <- paste(baseDir, "src/functions/", sep="")
 funcFiles <- c("formatRaw.R",
                "dataLoadMacrophage.R",
+               "loadData.R",
                "cleanCt.R",
                "clusterFilter.R",
                "violinPlot.R")
@@ -40,7 +45,8 @@ for(file in funcFiles){
 # formatRaw()
 
 ## load data
-ctTable <- dataLoadMacrophage()
+# ctTable <- dataLoadMacrophage()
+ctTable <- loadData()
 
 ## norm all data
 ctNorm <- cleanCt(ctTable, summaryOutput=T, cumExpCutoff=F, cumHist=F, normGene="none")

@@ -1,7 +1,7 @@
 #### clean Ct table ####
 require(reshape2)
 
-cleanCt <- function(ctRaw, summaryOutput = FALSE, cumExpCutoff = 0, cumHist = F, normGene = NULL){
+cleanCt <- function(ctCast, summaryOutput = FALSE, cumExpCutoff = 0, cumHist = F, normGene = NULL){
   
   ## set gene for normalization
   if(is.null(normGene)){
@@ -10,19 +10,19 @@ cleanCt <- function(ctRaw, summaryOutput = FALSE, cumExpCutoff = 0, cumHist = F,
   
   #### calculate log2Expression ####
   ## basic calculations based on recommended LoD from singular analysis toolkit
-  ctRaw$log2Ex <- (24 - ctRaw$ct)
-  ## set negative values to zero
-  ctRaw[(ctRaw$log2Ex < 0), "log2Ex"] <- as.numeric(0)
-  ## set failed runs to Zero
-  ctRaw[(ctRaw$Call=="Fail" & ctRaw$ct!=999), "log2Ex"] <- as.numeric(0)
-  
-  
-  #### reformat data ####
-  ## keep relevant columns
-  ctByGene <- ctRaw[,c("mouse", "cellType", "gene", "log2Ex")]
-  
-  ## melt/cast to reformat
-  ctCast <- recast(ctByGene, mouse + cellType ~ gene)
+  # ctRaw$log2Ex <- (24 - ctRaw$ct)
+  # ## set negative values to zero
+  # ctRaw[(ctRaw$log2Ex < 0), "log2Ex"] <- as.numeric(0)
+  # ## set failed runs to Zero
+  # ctRaw[(ctRaw$Call=="Fail" & ctRaw$ct!=999), "log2Ex"] <- as.numeric(0)
+  # 
+  # 
+  # #### reformat data ####
+  # ## keep relevant columns
+  # ctByGene <- ctRaw[,c("mouse", "cellType", "gene", "log2Ex")]
+  # 
+  # ## melt/cast to reformat
+  # ctCast <- recast(ctByGene, mouse + cellType ~ gene)
   
   ## change NAs to 0
   ctCast[is.na(ctCast)] <- as.numeric(0)
@@ -34,9 +34,9 @@ cleanCt <- function(ctRaw, summaryOutput = FALSE, cumExpCutoff = 0, cumHist = F,
   #### remove outliers and normalize ####
   ## remove cells with no expression of any gene
   cellsTotal <- nrow(ctCast)
-  cellsWithNoExp <- nrow(ctCast[which(rowSums(ctCast[,9:ncol(ctCast)], na.rm=T) == 0),])
+  cellsWithNoExp <- nrow(ctCast[which(rowSums(ctCast[,4:ncol(ctCast)], na.rm=T) == 0),])
   
-  ctCast <- ctCast[which(rowSums(ctCast[,9:ncol(ctCast)], na.rm=T) > 0),]
+  ctCast <- ctCast[which(rowSums(ctCast[,4:ncol(ctCast)], na.rm=T) > 0),]
   
   if(summaryOutput==T){
     cat(paste("No expression detected in ", cellsWithNoExp, "/", cellsTotal, " cells", sep=""))
@@ -88,7 +88,7 @@ cleanCt <- function(ctRaw, summaryOutput = FALSE, cumExpCutoff = 0, cumHist = F,
   #   gapdhNorm <- 10 - median(ctCast$normGene)
   #   ctCast$normGene <- ctCast$normGene + gapdhNorm
     ## assuming consistent normGene expression
-    ctNorm <- ctCast[,9:ncol(ctCast)] - ctCast[, normGene]
+    ctNorm <- ctCast[,4:ncol(ctCast)] - ctCast[, normGene]
     ## scale back to 0 expression reference
     # ctNorm <- ctNorm + median(ctCast$normGene)
     ## NO normGene Normalization ##
@@ -114,7 +114,7 @@ cleanCt <- function(ctRaw, summaryOutput = FALSE, cumExpCutoff = 0, cumHist = F,
       ctNorm[, i] <- ctNorm[, i] - median(ctNorm[, i])
     }
     
-    ctNorm <- cbind(ctCast[,1:8], ctNorm)
+    ctNorm <- cbind(ctCast[,1:3], ctNorm)
   }
   
   if(normGene == "none"){
@@ -122,7 +122,7 @@ cleanCt <- function(ctRaw, summaryOutput = FALSE, cumExpCutoff = 0, cumHist = F,
   }
   
   ## calculate total expression and remove outliers
-  ctNorm$ctSum <- rowSums(ctNorm[,9:ncol(ctNorm)])
+  ctNorm$ctSum <- rowSums(ctNorm[,4:ncol(ctNorm)])
   
   if(summaryOutput==T){
     par(mar=c(50, 50, 50, 50))

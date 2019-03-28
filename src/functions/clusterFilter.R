@@ -8,11 +8,11 @@ clusterFilter <- function(ctInput, testK = F, numCenters = 2, plotHeatmap=F, plo
   
   #### kmeans analysis ####
   ## order by ctSum
-  ctInput$ctSum <- rowSums(ctInput[,3:ncol(ctInput)])
+  ctInput$ctSum <- rowSums(ctInput[,4:ncol(ctInput)])
   ctInput <- ctInput[order(ctInput$ctSum) ,]
   ctInput$ctSum <- NULL
   
-  ctTestK <- ctInput[,3:ncol(ctInput)]
+  ctTestK <- ctInput[,4:ncol(ctInput)]
   
   ## set seed
   set.seed(1)
@@ -50,7 +50,7 @@ clusterFilter <- function(ctInput, testK = F, numCenters = 2, plotHeatmap=F, plo
   names(ctClust)[which(names(ctClust)=="normFit.cluster")] <- "kmeans.cluster"
   
   ## move kmeans column to column 3 to keep with id variables
-  ctClust <- ctClust[, c(1:2, ncol(ctClust), 3:(ncol(ctClust)-1))]
+  ctClust <- ctClust[, c(1:3, ncol(ctClust), 4:(ncol(ctClust)-1))]
   
   
   #### heatmap and cluster membership ####
@@ -59,10 +59,10 @@ clusterFilter <- function(ctInput, testK = F, numCenters = 2, plotHeatmap=F, plo
     
     ## account for kmeans.cluster column when in use
     if(heatmapFactor != "kmeans.cluster"){
-      idCols <- as.numeric(2)
+      idCols <- as.numeric(3)
       ctClust <- subset(ctClust, select = -kmeans.cluster)
     } else{
-      idCols <- as.numeric(3)
+      idCols <- as.numeric(4)
     }
     
     ## get p-values for differential expression for factors

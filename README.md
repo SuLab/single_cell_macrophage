@@ -1,7 +1,7 @@
 # Single Cell Macrophage Analysis
 
 ## required R packages
-    plyr
+`plyr`
     
     ggplot2
     

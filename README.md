@@ -2,13 +2,11 @@
 
 ## required R packages
 `plyr`
-    
-    ggplot2
-    
-    RColorBrewer
-    reshape2
-    grid
-    gridExtra
+`ggplot2`
+`RColorBrewer`
+`reshape2`
+`grid`
+`gridExtra`
 
 ## File Descriptions
 ### src directory

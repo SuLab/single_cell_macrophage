@@ -1,5 +1,5 @@
 ---
-title: "macrophage"
+title: "macrophage_analysis"
 output: html_document
 ---
 
@@ -8,31 +8,25 @@ knitr::opts_knit$set(global.par = TRUE)
 ```
 
 ```{r fig.width=22, fig.height=25, warning=FALSE, error=FALSE, message=FALSE, echo=FALSE, comment=NA}
+#### load packages ####
 library(plyr)
 library(ggplot2)
 library(RColorBrewer)
 library(reshape2)
-library(lattice)
-library(latticeExtra)
-library(gplots)
-library(gtools)
-library(stats)
 library(grid)
 library(gridExtra)
-library(corrplot)
 
 #### set repository directory ####
-## assumes being run from rstudio
-baseDir <- "~/Documents/teyton_handover/single_cell_macrophage/"
-# currentFile <- rstudioapi::getActiveDocumentContext()$path
-# baseDir <- gsub("single_cell_macrophage/.*", "single_cell_macrophage/", currentFile)
+## set baseDir if Knitting with RStudio button
+# baseDir <- "/single_cell_macrophage/"
 
+## sets path if run from runAnalysis.R
+currentFile <- rstudioapi::getActiveDocumentContext()$path
+baseDir <- gsub("single_cell_macrophage/.*", "single_cell_macrophage/", currentFile)
 
 #### source function scripts ####
 funcDir <- paste(baseDir, "src/functions/", sep="")
-funcFiles <- c("formatRaw.R",
-               "dataLoadMacrophage.R",
-               "loadData.R",
+funcFiles <- c("loadData.R",
                "cleanCt.R",
                "clusterFilter.R",
                "violinPlot.R")
@@ -41,27 +35,32 @@ for(file in funcFiles){
   source(file)
 }
 
-## format raw data files if necessary
-# formatRaw()
-
 ## load data
-# ctTable <- dataLoadMacrophage()
 ctTable <- loadData()
 
 ## norm all data
-ctNorm <- cleanCt(ctTable, summaryOutput=T, cumExpCutoff=F, cumHist=F, normGene="none")
-
-## drop extra genes
-# colKeep <- names(ctNorm)[!(names(ctNorm) %in% c("CD8A", "Gapdh", "CD3E", "RPL13A", "IFIT1", "CD28"))]
+ctNorm <- cleanCt(ctTable, 
+                  summaryOutput=T, 
+                  cumExpCutoff=F, 
+                  cumHist=F, 
+                  normGene="none")
 
 ## cluster and filter
-ctClust <- clusterFilter(ctNorm, testK = T, numCenters = 2, plotHeatmap=F, plotClustOnly=F,
-                          heatmapFactor = "kmeans.cluster", heatmapColorBy = c("mouse"),
-                          heatmapTissueLabel = "macrophage", 
-                          fisherTests = c("mouse"),
-                          cumulativeExpHist = T, filterClusters = F, clustersToRemove = NULL)
+ctClust <- clusterFilter(ctNorm, 
+                         testK = T, 
+                         numCenters = 2, 
+                         plotHeatmap=F, 
+                         plotClustOnly=F,
+                         heatmapFactor = "kmeans.cluster", 
+                         heatmapColorBy = c("mouse"),
+                         heatmapTissueLabel = "macrophage", 
+                         fisherTests = c("mouse"),
+                         cumulativeExpHist = T, 
+                         filterClusters = F, 
+                         clustersToRemove = NULL)
 
 
+## recluster
 # ctClust <- subset(ctClust, select = -kmeans.cluster)
 # ctClust <- clusterFilter(ctClust, testK = T, numCenters = 8, plotHeatmap=T, plotClustOnly=F,
 #                           heatmapFactor = "kmeans.cluster", heatmapColorBy = c("mouse", "probe", "age"),
@@ -70,24 +69,21 @@ ctClust <- clusterFilter(ctNorm, testK = T, numCenters = 2, plotHeatmap=F, plotC
 #                           cumulativeExpHist = T, filterClusters = F, clustersToRemove = NULL)
 
 #### violins ####
-## all clusters
-# tSNE(ctClust, pointSize = 5, perp = 40, plotGenes = F)
+violinPlot(ctGenes=ctClust, 
+           byFactor="kmeans.cluster", 
+           factorOrder=c(1:2),
+           groupLabel="clusters", 
+           extraLabel="for macrophage samples",
+           dotSize = 1.5, 
+           dotAlpha = 0.3)
 
-violinPlot(ctGenes=ctClust, byFactor="kmeans.cluster", factorOrder=c(1:2),
-           groupLabel="clusters", extraLabel="for macrophage samples",
-           dotSize = 1.5, dotAlpha = 0.3)
-
-violinPlot(ctGenes=ctClust, byFactor="mouse", factorOrder=c(1, 4:9),
-           groupLabel="mice", extraLabel="for macrophage samples",
-           dotSize = 1.5, dotAlpha = 0.3)
-
-
-## first cluster number = 9
-## remove cluster = 5
-## second cluster number = 8
-## turn off cumulative expression hist (because of error)
-# rmarkdown::render(input = "~/Documents/abe/biomark/qpcr/src/controller/macrophage/macrophage_all.Rmd", output_format = "pdf_document", output_file = "~/Documents/abe/biomark/qpcr/results/pdf/macrophage/macrophage_allSamples_2.26.2019_2.pdf")
-
+violinPlot(ctGenes=ctClust, 
+           byFactor="mouse", 
+           factorOrder=c(1, 4:9),
+           groupLabel="mice", 
+           extraLabel="for macrophage samples",
+           dotSize = 1.5, 
+           dotAlpha = 0.3)
 
 #### bottom ####
 ```

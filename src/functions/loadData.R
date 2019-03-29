@@ -1,8 +1,7 @@
 #### Load Data ####
 loadData <- function(){
   
-  # fileDir <- "~/Documents/teyton_handover/single_cell_macrophage/data/"
-  fileDir <- paste(baseDir, "data/", sep="")
+  fileDir <- paste(baseDir, "/data/", sep="")
   
   fileList <- list.files(fileDir)[grep("meta.csv", list.files(fileDir), invert = T)]
   
@@ -104,6 +103,9 @@ loadData <- function(){
   ctCast <- recast(ctTable, ... ~ gene, measure.var = "log2Ex")
   
   ctCast <- subset(ctCast, select = -variable)
+  
+  ## remove "empty" wells
+  ctCast <- subset(ctCast, !is.na(mouse))
   
   ## Do not require complete cases (allows NAs)
   #ctCast <- ctCast[complete.cases(ctCast), ]

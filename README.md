@@ -2,7 +2,9 @@
 
 ## required R packages
     plyr
+    
     ggplot2
+    
     RColorBrewer
     reshape2
     grid

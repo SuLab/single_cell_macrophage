@@ -600,7 +600,7 @@ clusterFilter <- function(ctInput, testK = F, numCenters = 2, plotHeatmap=F, plo
   if(cumulativeExpHist == T){
     #### print histogram of cumulative expression for each cell, colored by cluster ####
     #ctClust$ctSum <- rowSums(ctClust[,10:ncol(ctClust)])
-    ctExp <- (ctClust[,10:ncol(ctClust)])^2
+    ctExp <- (ctClust[,4:ncol(ctClust)])^2
     ctClust$ctSum <- log2(rowSums(ctExp))
     ctSumMin <- min(ctClust$ctSum) - (min(ctClust$ctSum) %% 50)
     ctSumMax <- 50 + max(ctClust$ctSum) - (max(ctClust$ctSum) %% 50)

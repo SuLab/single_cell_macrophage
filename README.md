@@ -8,6 +8,7 @@
 5. run the code in `src/runAnalysis.R`
 
 ## Required R packages
+`knitr`
 `plyr`
 `ggplot2`
 `RColorBrewer`
